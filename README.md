@@ -122,4 +122,10 @@ python3 query_tool.py
 未來可延伸：
 
 - 月份範圍查詢  
-- API / Web 查詢介面  
+- API / Web 查詢介面
+
+ ## 🙋‍♂️ 作者
+
+陳柏瀚 Jim Chen 
+GitHub: https://github.com/sis051087
+
