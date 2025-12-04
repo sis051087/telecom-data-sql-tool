@@ -1,47 +1,36 @@
 import sqlite3
 import pandas as pd
+import os
 
-# 讀取CSV
-df = pd.read_csv("src/../data/行動寬頻用戶每月平均數據用量.csv")
+# 讀取資料
+year_folder = "src/../output_by_year"
 
-# 清理欄位
-df.columns = df.columns.str.strip()
+all_data = []
 
-# 年月
-df["year"] = df["年月"].astype(str).str.split("/").str[0].astype(int)
-df["month"] = df["年月"].astype(str).str.split("/").str[1].astype(int)
+for file in os.listdir(year_folder):
+    if file.endswith(".xlsx"):
+        path = os.path.join(year_folder, file)
+        df = pd.read_excel(path)
+        all_data.append(df)
 
-# 英文
+df = pd.concat(all_data, ignore_index=True)
+
+# 統一欄位
 df = df.rename(columns={
+    "年": "year",
+    "月": "month",
     "業者名稱": "operator",
     "數據傳輸量（GBytes）": "total_gb",
     "用戶數": "users",
-    "平均每一用戶數據傳輸量（GBytes）": "avg_gb",
+    "平均每一用戶數據傳輸量（GBytes）": "avg_gb"
 })
 
-# 要存入 DB 的欄位
-df = df[["year", "month", "operator", "total_gb", "users", "avg_gb"]]
+# 寫入 
+db_path = "src/../data/mobile_usage.db"
+conn = sqlite3.connect(db_path)
 
-# 建立 SQLite 資料庫
-conn = sqlite3.connect("../data/mobile_usage.db")
-cursor = conn.cursor()
+df.to_sql("mobile_usage", conn, if_exists="replace", index=False)
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS mobile_usage (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    year INTEGER,
-    month INTEGER,
-    operator TEXT,
-    total_gb REAL,
-    users INTEGER,
-    avg_gb REAL
-);
-""")
-
-# 寫入 DB
-df.to_sql("mobile_usage", conn, if_exists="append", index=False)
-
-conn.commit()
 conn.close()
 
-print("資料庫建立完成！mobile_usage.db 已建立。")
+print("SQLite 資料庫建立完成！來源：output_by_year 內的整理後資料")
