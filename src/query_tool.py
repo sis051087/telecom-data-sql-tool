@@ -1,6 +1,14 @@
 import sqlite3
+import pandas as pd
 
-DB_PATH = "../data/mobile_usage.db"
+conn = sqlite3.connect("src/../data/mobile_usage.db")
+
+query = "SELECT * FROM mobile_usage WHERE year = 110"
+
+df = pd.read_sql_query(query, conn)
+print(df)
+
+DB_PATH = "src/../data/mobile_usage.db"
 
 def run_query(sql):
     conn = sqlite3.connect(DB_PATH)
