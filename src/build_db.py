@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 
 # 讀取CSV
-df = pd.read_csv("../data/行動寬頻用戶每月平均數據用量.csv")
+df = pd.read_csv("src/../data/行動寬頻用戶每月平均數據用量.csv")
 
 # 清理欄位
 df.columns = df.columns.str.strip()
